@@ -20,7 +20,7 @@ def add_before_request(app: Flask):
     """Add before_request function to app."""
 
     @app.before_request
-    def before_request() -> Optional[Response]:
+    def before_request():
         """Run before each request.
 
         Check whether the access token is in the cookie in a proper way.
@@ -71,8 +71,8 @@ def add_errorhandler(app: Flask):
         """
 
         # Default code
-        code = 500
-        description = repr(e)
+        code: Optional[int] = 500
+        description: Optional[str] = repr(e)
         if isinstance(e, HTTPException):
             code = e.code
             description = e.description

@@ -90,9 +90,7 @@ class User(db.Model):
             abort(404, "User not found.")
 
     @classmethod
-    def get_by_email_and_password(
-        cls, email: str, password: str
-    ) -> Dict[str, Union["int, str"]]:
+    def get_by_email_and_password(cls, email: str, password: str):
         """Get a user by email address and password."""
 
         # Hash the email to use that in the lookup
