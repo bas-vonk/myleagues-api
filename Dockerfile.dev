@@ -1,0 +1,14 @@
+FROM python:3.8
+
+SHELL ["/bin/bash", "-c"]
+WORKDIR /www
+
+RUN apt-get -y install openssl --no-install-recommends
+
+# Copy the complete repository to the /www folder
+COPY . /www
+
+# Upgrade pip and install the required packages
+RUN pip install setuptools==57.4.0
+RUN pip install pip==21.2.4
+RUN pip install -e .
