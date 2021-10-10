@@ -1,0 +1,56 @@
+runtime: python38
+service: api
+
+env_variables:
+  FERNET_KEY: hsd-uPreLeakYIgtejGF5-ahqCEn_uujYFyzWv3d5uc=
+  POSTGRES_HOSTNAME: 34.83.95.10
+  POSTGRES_USERNAME: myleagues
+  POSTGRES_PASSWORD: myleagues_password
+  POSTGRES_DATABASE: myleagues_db
+  POSTGRES_SCHEMA: myleagues
+  SECRET_KEY: cJfb8n2d9gynYngnsYoBrbdamedecwbTrfYXyxYhmXLbudsnuH9WBtoRApAqsPZE
+  FLASK_ENV: development
+  TZ: "Europe/Amsterdam"
+  PRIVATE_KEY: |-
+    -----BEGIN RSA PRIVATE KEY-----
+    MIIEowIBAAKCAQEAvdH2XTbUMEsAFdp9/640c7eD5voLSeX6TiG3vyyK61Wa4zrZ
+    Rjs/vuKUIU5l66vCJmVtRpB/JqpbgzwJ0lm2ZNxlcooSiSG8hK5wlyWHxCVRwRPd
+    fCwLxB0dn4cHu+Hf66+bL/tvC74Dnn6ARJKz70egNFfXHov4vcR3PT7VZ/fOrMwd
+    5AV92gLc66WZu5QM5fgn0sQP7LT017ogKKBeOUvviHgeWEQi8Im9hTVXbFjeDJBV
+    vrv2/wxKfxPaQ6B1qmy8YOpwu8VMUi2QuJxXgyHmE3yAfcQNXv9x3l+HIcMyKFjf
+    V8GV+BmLjNIg8GCq6PAG2kG2tFN4C4+BkbZ+4QIDAQABAoIBAC0G80PlT6ws/lYw
+    wBa4giS48YcG5UqgTSHfibDFpiZw5g7k1Ml+IH7tTGoiKLcgxStKgANvH1pSquaU
+    hVfqhAOk7EOhUQhKgmeO4ZJZCr2ShLQiPDXKVPguV+qRo1oEGJPV0iAtqofEiSM9
+    qruZeSlXej8wXw0V8ulBA2/5ybGhhBPBy85yE3cVC8QqZ/UUnxGohY0O/0J1OHUJ
+    X8M/FI3DZW7F7iT8s2jJWjJH1w44b41pBiwYqMH55+diTbfptpRvmamMmEwF53cN
+    C2tfrUgDmgoAFnnW9k7Cn21mmRmMLUIGrORqQbmY6a7qhtsAw0A9uPomoUUlUQTH
+    a8JTcGkCgYEA6lyG8UcS/xToyklkPoeveNNRatIyAE8cN0wJ5ikHkTogFF26PY/4
+    irHzJgsF1WebuysMcUFQ2FF6f+kNUBmqXemuxLbVQYAE3jDamRdnHR0sFd9uVTVo
+    3zSbpzTC8Nhj+h5cyZufHz5s1Ke8VfGWSRVr0KOeXNDS6df25J0gDZ8CgYEAz1ij
+    PhB7xIoCR7RM8nq5umdud1pGcCfZC+SD+3p+nwGb+nwiJgdRaubv3GpPf4wkF+Ih
+    p984YvlGZ/3lyN4fWgPCxjXzj5bxrPyHILmglXehqiunq0RyO2jqyYJrTwv+cavL
+    B8Cxj9tSv8o9cyqqZgZ7qWM0eFtXWggdhygtI38CgYB5sDONInd1pXi+WF9JrJBr
+    L2ZuDdhSmsEu4Teen51DRigUCxrCDnhiI8X58e1Egri09cRPJjgBKkVuFyeHeNwi
+    SU0q7ThL+1oLuNg4d5Nd5aDXdp1GdyYOB7XumxHBlspKu+s376suwO4neTTsdzWu
+    mwXRXrPCw9dP/og+6msTRwKBgD1mYxjK6su9joVLSAn5+6vOWzDuw7MMqcJSzh6X
+    HI3bfSQExFv8iMieUGM1/AqqJjoIVa0PdfQhGw9KaVQ9Ko2OVYw6h8B6k2CFe0Je
+    lcYNIgtxV/poj2c2X2iCvWIwDA3/MGVAU5Rk/zEaI25KMSF7Q/1aCjyl180qYAwZ
+    ApzjAoGBAI09DR1mIwMdaRLPuqU64pL0sPLFcul8qprFR4vNIg2QpqfiaoXCnqmJ
+    k4PpwIbH+uG5n67sh/LkmjovOgAk2nnRsktTpU504y4VkMTNjXREuK0h8UlrbwSa
+    xQvr9Gr/6sZ3BDEjOHEuUi4A0TvagZrFmuKF+NzxiQFp9PzYKtI6
+    -----END RSA PRIVATE KEY-----
+  PUBLIC_KEY: |-
+    -----BEGIN PUBLIC KEY-----
+    MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAvdH2XTbUMEsAFdp9/640
+    c7eD5voLSeX6TiG3vyyK61Wa4zrZRjs/vuKUIU5l66vCJmVtRpB/JqpbgzwJ0lm2
+    ZNxlcooSiSG8hK5wlyWHxCVRwRPdfCwLxB0dn4cHu+Hf66+bL/tvC74Dnn6ARJKz
+    70egNFfXHov4vcR3PT7VZ/fOrMwd5AV92gLc66WZu5QM5fgn0sQP7LT017ogKKBe
+    OUvviHgeWEQi8Im9hTVXbFjeDJBVvrv2/wxKfxPaQ6B1qmy8YOpwu8VMUi2QuJxX
+    gyHmE3yAfcQNXv9x3l+HIcMyKFjfV8GV+BmLjNIg8GCq6PAG2kG2tFN4C4+BkbZ+
+    4QIDAQAB
+    -----END PUBLIC KEY-----
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always
