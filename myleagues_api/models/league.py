@@ -22,7 +22,6 @@ class League(db.Model):
 
     __tablename__ = "leagues"
 
-    # fmt: off
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     name = db.Column(db.String(32))
     ranking_system = db.Column(db.String(32))
@@ -31,10 +30,12 @@ class League(db.Model):
     created_at = db.Column(db.BigInteger, index=False)
     deleted_at = db.Column(db.BigInteger, index=False)
 
-    players = db.relationship("User", secondary=participations, backref="league", lazy=True)
-    matches = db.relationship("Match", order_by="asc(Match.date)", backref="league", lazy=True)
-
-    # fmt: on
+    players = db.relationship(
+        "User", secondary=participations, backref="league", lazy=True
+    )
+    matches = db.relationship(
+        "Match", order_by="asc(Match.date)", backref="league", lazy=True
+    )
 
     @classmethod
     def create(cls, name, admin_user_id, ranking_system="regular"):

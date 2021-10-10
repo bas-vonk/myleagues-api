@@ -27,7 +27,8 @@ def add_before_request(app: Flask):
         If it isn't, redirect to the Login page.
         """
 
-        # There's a couple of open endpoints for which the user doesn't need to be authenticated
+        # There's a couple of open endpoints for which the user doesn't need to be
+        # authenticated
         if request.endpoint in OPEN_ENDPOINTS or request.method in OPEN_METHODS:
             return
 
@@ -54,7 +55,8 @@ def add_errorhandler(app: Flask):
 
     @app.errorhandler(Exception)
     def errorhandler(e: HTTPException) -> Response:
-        """Handle HTTPExceptions (thrown by flask.abort in other components of the software).
+        """Handle HTTPExceptions (thrown by flask.abort in other components of
+        the software).
 
         Parameters
         ----------

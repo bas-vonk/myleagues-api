@@ -38,7 +38,6 @@ class User(db.Model):
 
     __tablename__ = "users"
 
-    # fmt: off
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username_encrypted = db.Column(db.String(256))
     username_hashed = db.Column(db.String(128), unique=True)
@@ -48,8 +47,9 @@ class User(db.Model):
     email_confirmed_at = db.Column(db.DateTime, index=False)
     deleted_at = db.Column(db.BigInteger, index=False)
 
-    leagues = db.relationship("League", secondary=participations, backref="user", lazy=True)
-    # fmt: on
+    leagues = db.relationship(
+        "League", secondary=participations, backref="user", lazy=True
+    )
 
     @classmethod
     def create(cls, username, email, password):
@@ -135,14 +135,16 @@ class User(db.Model):
     def hash(value: str):
 
         # Assume no collisions will happen when using sha512
-        # https://crypto.stackexchange.com/questions/89558/are-sha-256-and-sha-512-collision-resistant
+        # https://crypto.stackexchange.com/questions/89558/
+        # are-sha-256-and-sha-512-collision-resistant
 
         return hashlib.sha512(f"{db_salt}{value}".encode(ENCODING)).hexdigest()
 
     # def as_dict(self):
     #
     #     user = {
-    #         column.name: getattr(self, column.name) for column in self.__table__.columns
+    #         column.name: getattr(self, column.name) for column
+    #         in self.__table__.columns
     #     }
     #
     #     # Drop hashed values
