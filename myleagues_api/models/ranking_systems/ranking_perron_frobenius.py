@@ -5,7 +5,7 @@ class PerronFrobenius(Ranking):
     def __init__(self, league):
         super().__init__(league)
 
-    def get_ranking_history():
+    def get_ranking_history(self):
         print("Hello ranking history.")
 
     def get_ranking(self):

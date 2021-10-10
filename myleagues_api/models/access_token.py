@@ -1,7 +1,7 @@
 import uuid
 from os import environ
 from time import time
-from typing import Dict, Union
+from typing import Any
 
 import jwt
 from flask import abort
@@ -50,7 +50,9 @@ class AccessToken(db.Model):
         return access_token_string
 
     @staticmethod
-    def verify_and_return_contents(access_token: str) -> Dict[str, Union[int, str]]:
+    def verify_and_return_contents(
+        access_token: str,
+    ) -> Any:
         """Verify and returns the contents of an access token.
 
         Parameters

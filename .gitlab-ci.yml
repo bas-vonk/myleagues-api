@@ -55,3 +55,9 @@ pycodestyle:
   script:
     - pip install pycodestyle
     - pycodestyle .
+
+mypy:
+  stage: linting
+  script:
+    - pip install mypy==0.910
+    - mypy --install-types --non-interactive .
