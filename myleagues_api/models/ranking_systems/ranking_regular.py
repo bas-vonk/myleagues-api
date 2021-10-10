@@ -17,8 +17,10 @@ class Regular(Ranking):
             matches = self.all_matches[:i]
 
             labels.append(
-                f"{matches[-1].home_player.username} - {matches[-1].away_player.username} "
-                f"({matches[-1].home_score} - {matches[-1].away_score})"
+                f"{matches[-1].home_player.username} - "
+                f"{matches[-1].away_player.username} "
+                f"({matches[-1].home_score} - "
+                f"{matches[-1].away_score})"
             )
 
             ranking = self.get_ranking(matches)

@@ -22,12 +22,12 @@ class AccessToken(db.Model):
 
     __tablename__ = "access_tokens"
 
-    # fmt: off
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
-    user_id = db.Column(UUID(as_uuid=True), db.ForeignKey("users.id"), index=True, unique=False)
+    user_id = db.Column(
+        UUID(as_uuid=True), db.ForeignKey("users.id"), index=True, unique=False
+    )
     access_token = db.Column(db.Text)
     created_at = db.Column(db.BigInteger, index=False)
-    # fmt: on
 
     @classmethod
     def generate_and_store(cls, user: User) -> str:
