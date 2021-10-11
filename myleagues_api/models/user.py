@@ -6,13 +6,14 @@ from typing import Dict, Union
 
 from cryptography.fernet import Fernet
 from flask import abort
-from myleagues_api.db import db
-from myleagues_api.models.league import League
-from myleagues_api.tables.participations import participations
 from sqlalchemy import exc
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm.exc import NoResultFound
 from werkzeug.security import check_password_hash, generate_password_hash
+
+from myleagues_api.db import db
+from myleagues_api.models.league import League
+from myleagues_api.tables.participations import participations
 
 # TODO: Replace with environment
 ENCODING = "utf-8"

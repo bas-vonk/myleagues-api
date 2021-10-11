@@ -2,10 +2,11 @@
 
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
+
 from myleagues_api.models.access_token import AccessToken
 from myleagues_api.models.league import League
 from myleagues_api.models.user import User
-from werkzeug.exceptions import HTTPException
 
 blueprint_user = Blueprint("user", __name__)
 CORS(blueprint_user)

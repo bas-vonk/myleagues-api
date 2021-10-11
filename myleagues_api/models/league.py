@@ -8,14 +8,22 @@ from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from myleagues_api.db import db
-from myleagues_api.models.ranking_systems.ranking_regular import Regular
-from myleagues_api.models.ranking_systems.ranking_perron_frobenius import (
-    PerronFrobenius,
-)
+from myleagues_api.models.ranking_systems.ranking import RankingSystemFactory
+from myleagues_api.models.ranking_systems.ranking_perron_frobenius import \
+    PerronFrobeniusRankingSystem
+from myleagues_api.models.ranking_systems.ranking_regular import \
+    RegularRankingSystem
 from myleagues_api.tables.participations import participations
 
-
-ranking_systems = {"regular": Regular, "perron_frobenius": PerronFrobenius}
+# Register the ranking systems
+# TODO: Would be nice to do this in the individual files, but this causes
+# a problem where the ranking systems are not registered because the files are not
+# loaded
+ranking_system_factory = RankingSystemFactory()
+ranking_system_factory.register_ranking_system("regular", RegularRankingSystem)
+ranking_system_factory.register_ranking_system(
+    "perron_frobenius", PerronFrobeniusRankingSystem
+)
 
 
 class League(db.Model):
@@ -31,7 +39,11 @@ class League(db.Model):
     deleted_at = db.Column(db.BigInteger, index=False)
 
     players = db.relationship(
-        "User", secondary=participations, backref="league", lazy=True
+        "User",
+        secondary=participations,
+        order_by="asc(User.id)",
+        backref="league",
+        lazy=True,
     )
     matches = db.relationship(
         "Match", order_by="asc(Match.date)", backref="league", lazy=True
@@ -39,6 +51,10 @@ class League(db.Model):
 
     @classmethod
     def create(cls, name, admin_user_id, ranking_system="regular"):
+
+        # Check if the ranking system exists
+        if ranking_system not in ranking_system_factory.ranking_systems:
+            abort(404, "Ranking system not found.")
 
         league = cls(
             name=name,
@@ -76,11 +92,16 @@ class League(db.Model):
 
     def get_ranking(self):
 
-        ranking_system = ranking_systems[self.ranking_system](league=self)
+        ranking_system = ranking_system_factory.get_ranking_system(
+            self.ranking_system, league=self
+        )
         return ranking_system.get_ranking()
 
     def get_ranking_history(self):
-        ranking_system = ranking_systems[self.ranking_system](league=self)
+
+        ranking_system = ranking_system_factory.get_ranking_system(
+            self.ranking_system, league=self
+        )
         return ranking_system.get_ranking_history()
 
     def get_players(self):

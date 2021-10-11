@@ -4,6 +4,7 @@ from time import time
 
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
+
 from myleagues_api.models.match import Match
 
 blueprint_match = Blueprint("match", __name__)

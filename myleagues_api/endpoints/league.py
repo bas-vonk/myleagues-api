@@ -2,6 +2,7 @@
 
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
+
 from myleagues_api.models.league import League
 
 blueprint_league = Blueprint("league", __name__)
@@ -10,6 +11,7 @@ CORS(blueprint_league)
 
 @blueprint_league.route("/league", methods=["POST"])
 def create():
+    """Create endpoint for 'create league' functionality."""
 
     data = request.json
 
@@ -32,6 +34,7 @@ def create():
 @blueprint_league.route("/league/", defaults={"id": None})
 @blueprint_league.route("/league/<id>", methods=["GET"])
 def read(id):
+    """Create endpoint for 'getleague' functionality."""
 
     # Define the filters to find a league
     filter = {"id": id, "join_code": request.args.get("filter[join_code]")}
@@ -77,6 +80,7 @@ def read(id):
 
 @blueprint_league.route("/league/<id>/ranking_history", methods=["GET"])
 def get_ranking_history(id):
+    """Create endpoint for 'get ranking history' functionality."""
 
     filter = {"id": id}
 

@@ -5,12 +5,13 @@ from typing import Optional
 
 from flask import Flask, Response, abort, g, jsonify, request
 from flask_cors import CORS
+from werkzeug.exceptions import HTTPException
+
 from myleagues_api.db import init_db
 from myleagues_api.endpoints.league import blueprint_league
 from myleagues_api.endpoints.match import blueprint_match
 from myleagues_api.endpoints.user import blueprint_user
 from myleagues_api.models.access_token import AccessToken
-from werkzeug.exceptions import HTTPException
 
 OPEN_ENDPOINTS = ["user.login", "user.register"]
 OPEN_METHODS = ["OPTIONS"]
@@ -55,8 +56,7 @@ def add_errorhandler(app: Flask):
 
     @app.errorhandler(Exception)
     def errorhandler(e: HTTPException) -> Response:
-        """Handle HTTPExceptions (thrown by flask.abort in other components of
-        the software).
+        """Handle HTTPExceptions (thrown by flask.abort elsewhere in the software).
 
         Parameters
         ----------
@@ -109,7 +109,7 @@ def create_app(config_file, db) -> Flask:
 
         # Add before_request and errorhandler functions
         add_before_request(app)
-        add_errorhandler(app)
+        # add_errorhandler(app)
 
         # Register all the blueprints (views/endpoints)
         app.register_blueprint(blueprint_user)
