@@ -30,40 +30,40 @@ image: python:latest
 #   - source venv/bin/activate
 
 stages:
-  - linting
+  - lint
 
 black:
-  stage: linting
+  stage: lint
   image: registry.gitlab.com/pipeline-components/black:latest
   script:
     - black --check --verbose -- .
 
 isort:
-  stage: linting
+  stage: lint
   script:
     - pip install isort
     - isort . -c --profile black
 
 flake8:
-  stage: linting
+  stage: lint
   image: registry.gitlab.com/pipeline-components/flake8:latest
   script:
     - flake8 --verbose .
 
 pydocstyle:
-  stage: linting
+  stage: lint
   script:
     - pip install pydocstyle
     - pydocstyle .
 
 pycodestyle:
-  stage: linting
+  stage: lint
   script:
     - pip install pycodestyle
     - pycodestyle .
 
 mypy:
-  stage: linting
+  stage: lint
   script:
     - pip install mypy==0.910
     - mypy --install-types --non-interactive .
