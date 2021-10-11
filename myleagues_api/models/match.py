@@ -8,6 +8,7 @@ from myleagues_api.db import db
 
 
 class Match(db.Model):
+    """Match model."""
 
     __tablename__ = "matches"
 
@@ -47,6 +48,7 @@ class Match(db.Model):
         created_by,
         created_at,
     ):
+        """Create a match."""
 
         match = cls(
             league_id=league_id,
@@ -66,5 +68,6 @@ class Match(db.Model):
         return match
 
     def as_dict(self):
+        """Return a match as dictionary."""
 
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}

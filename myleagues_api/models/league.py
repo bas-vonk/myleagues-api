@@ -9,10 +9,10 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from myleagues_api.db import db
 from myleagues_api.models.ranking_systems.ranking import RankingSystemFactory
-from myleagues_api.models.ranking_systems.ranking_perron_frobenius import \
-    PerronFrobeniusRankingSystem
-from myleagues_api.models.ranking_systems.ranking_regular import \
-    RegularRankingSystem
+from myleagues_api.models.ranking_systems.ranking_perron_frobenius import (
+    PerronFrobeniusRankingSystem,
+)
+from myleagues_api.models.ranking_systems.ranking_regular import RegularRankingSystem
 from myleagues_api.tables.participations import participations
 
 # Register the ranking systems
@@ -27,6 +27,7 @@ ranking_system_factory.register_ranking_system(
 
 
 class League(db.Model):
+    """League model."""
 
     __tablename__ = "leagues"
 
@@ -51,6 +52,7 @@ class League(db.Model):
 
     @classmethod
     def create(cls, name, admin_user_id, ranking_system="regular"):
+        """Create a league."""
 
         # Check if the ranking system exists
         if ranking_system not in ranking_system_factory.ranking_systems:
@@ -72,6 +74,7 @@ class League(db.Model):
 
     @classmethod
     def read_one(cls, filter):
+        """Read one league from the database."""
 
         try:
             return cls.query.filter_by(**filter).one()
@@ -82,6 +85,7 @@ class League(db.Model):
 
     @classmethod
     def read_many(cls, filter):
+        """Read many leagues from the database."""
 
         if "player_id" in filter:
             return cls.query.join(participations).filter(
@@ -91,6 +95,7 @@ class League(db.Model):
         return cls.query.filter_by(**filter).all()
 
     def get_ranking(self):
+        """Get the current ranking for this league."""
 
         ranking_system = ranking_system_factory.get_ranking_system(
             self.ranking_system, league=self
@@ -98,6 +103,7 @@ class League(db.Model):
         return ranking_system.get_ranking()
 
     def get_ranking_history(self):
+        """Get the ranking history for this league."""
 
         ranking_system = ranking_system_factory.get_ranking_system(
             self.ranking_system, league=self
@@ -105,6 +111,7 @@ class League(db.Model):
         return ranking_system.get_ranking_history()
 
     def get_players(self):
+        """Get the players for this league."""
 
         players = []
         for player in self.players:
@@ -113,6 +120,7 @@ class League(db.Model):
         return players
 
     def get_matches(self):
+        """Get the matches for this league."""
 
         matches = []
         for match in self.matches:
@@ -130,14 +138,18 @@ class League(db.Model):
         return matches
 
     def set_join_code(self):
+        """Set the join code."""
+
         self.join_code = self.get_unique_join_code()
 
     def as_dict(self):
+        """Return the league as dictionary."""
 
         return {col.name: getattr(self, col.name) for col in self.__table__.columns}
 
     @classmethod
     def get_unique_join_code(cls, length=4):
+        """Get a unique join code."""
 
         join_code = "".join(
             random.choices(string.ascii_uppercase + string.digits, k=length)
