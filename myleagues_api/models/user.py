@@ -54,6 +54,7 @@ class User(db.Model):
 
     @classmethod
     def create(cls, username, email, password):
+        """Create a user."""
 
         user_dict = {
             f"username{SUFFIX_ENCRYPTED}": cls.encrypt(username),
@@ -83,6 +84,7 @@ class User(db.Model):
 
     @classmethod
     def read(cls, filter):
+        """Read a user."""
 
         try:
             return cls.query.filter_by(**filter).one()
@@ -103,10 +105,13 @@ class User(db.Model):
         return user
 
     def password_is_correct(self, password: str) -> bool:
+        """Check whether the password is correct."""
+
         return check_password_hash(self.password_hashed, password)
 
     @classmethod
     def add_to_league(cls, user_id, league_id):
+        """Add a player to a league."""
 
         user = cls.read({"id": user_id})
         league = League.read_one(filter={"id": league_id})
@@ -116,22 +121,31 @@ class User(db.Model):
 
     @property
     def username(self):
+        """Get the decrypted username."""
+
         return self.decrypt(self.username_encrypted)
 
     @property
     def email(self):
+        """Get the decrypted email."""
+
         return self.decrypt(self.email_encrypted)
 
     @staticmethod
     def encrypt(value: str):
+        """Encrypt a value."""
+
         return f.encrypt(value.encode(ENCODING)).decode(ENCODING)
 
     @staticmethod
     def decrypt(encrypted_value: str):
+        """Decrypt a value."""
+
         return f.decrypt(encrypted_value.encode(ENCODING)).decode(ENCODING)
 
     @staticmethod
     def hash(value: str):
+        """Hash a value."""
 
         # Assume no collisions will happen when using sha512
         # https://crypto.stackexchange.com/questions/89558/
@@ -160,7 +174,3 @@ class User(db.Model):
     #     user = {k: v for k, v in user.items() if not k.endswith(SUFFIX_ENCRYPTED)}
     #
     #     return user
-
-
-if __name__ == "__main__":
-    print(User())

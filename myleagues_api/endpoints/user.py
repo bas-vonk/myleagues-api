@@ -14,6 +14,7 @@ CORS(blueprint_user)
 
 @blueprint_user.route("/login", methods=["POST"])
 def login():
+    """Create endpoint for the 'login' action."""
 
     data = request.json
 
@@ -34,6 +35,7 @@ def login():
 
 @blueprint_user.route("/register", methods=["POST"])
 def register():
+    """Create endpoint for the 'register' action."""
 
     data = request.json
 
@@ -48,6 +50,7 @@ def register():
 
 @blueprint_user.route("/user/join_league", methods=["POST"])
 def join_league():
+    """Create endpoint for the 'join league' action."""
 
     data = request.json
 
@@ -76,6 +79,7 @@ def join_league():
 
 @blueprint_user.route("/user/leagues", methods=["GET"])
 def user_leagues():
+    """Create endpoint for the 'get leagues for user' action."""
 
     user = User.read({"id": g.user_id})
 

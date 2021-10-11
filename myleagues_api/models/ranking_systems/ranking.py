@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 
 
 class BaseRankingSystem(ABC):
+    """Base class for the ranking systems."""
+
     def __init__(self, league):
 
         self.league = league
@@ -11,11 +13,13 @@ class BaseRankingSystem(ABC):
 
     @abstractmethod
     def get_ranking(self):
+        """Get ranking."""
         raise NotImplementedError(
             "Child class must contain 'get_current_ranking' method."
         )
 
     def get_ranking_list_from_dict(self, ranking_dict):
+        """Get ranking list from ranking dictionary."""
 
         ranking: list = list(ranking_dict.values())
         ranking = sorted(ranking, key=lambda k: -k["pts_secondary"])
@@ -26,6 +30,7 @@ class BaseRankingSystem(ABC):
         return ranking
 
     def get_initial_ranking_dict(self):
+        """Get the empty ranking dictionary object."""
 
         # Build the empty ranking
         initial_dictionary = {}
@@ -40,6 +45,7 @@ class BaseRankingSystem(ABC):
         return initial_dictionary
 
     def get_ranking_history(self):
+        """Get the ranking history."""
 
         labels = ["start"]
         datasets = {player.id: {"data": [0]} for player in self.players}
@@ -69,13 +75,19 @@ class BaseRankingSystem(ABC):
 
 
 class RankingSystemFactory:
+    """Ranking system factory."""
+
     def __init__(self):
         self._ranking_systems = {}
 
     def register_ranking_system(self, ranking_system_name, ranking_system_obj):
+        """Register a ranking system."""
+
         self._ranking_systems[ranking_system_name] = ranking_system_obj
 
     def get_ranking_system(self, ranking_system_name, **kwargs):
+        """Get a ranking system."""
+
         ranking_system_obj = self._ranking_systems.get(ranking_system_name)
         if not ranking_system_obj:
             raise ValueError(ranking_system_name)

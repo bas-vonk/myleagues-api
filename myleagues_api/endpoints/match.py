@@ -13,6 +13,7 @@ CORS(blueprint_match)
 
 @blueprint_match.route("/match", methods=["POST"])
 def post():
+    """Create endpoint for the 'create match' action."""
 
     data = request.json
 
