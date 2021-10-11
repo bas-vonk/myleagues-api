@@ -2,7 +2,6 @@ import hashlib
 import os
 import re
 import uuid
-from typing import Dict, Union
 
 from cryptography.fernet import Fernet
 from flask import abort
