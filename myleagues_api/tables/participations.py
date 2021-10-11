@@ -1,7 +1,8 @@
 """Join table."""
 
-from myleagues_api.db import db
 from sqlalchemy.dialects.postgresql import UUID
+
+from myleagues_api.db import db
 
 participations = db.Table(
     "participations",

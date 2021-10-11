@@ -5,9 +5,10 @@ from typing import Any
 
 import jwt
 from flask import abort
+from sqlalchemy.dialects.postgresql import UUID
+
 from myleagues_api.db import db
 from myleagues_api.models.user import User
-from sqlalchemy.dialects.postgresql import UUID
 
 ISSUER = "myleagues-api"
 ALGORITHM = "RS256"

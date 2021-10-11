@@ -2,8 +2,9 @@
 
 import uuid
 
-from myleagues_api.db import db
 from sqlalchemy.dialects.postgresql import UUID
+
+from myleagues_api.db import db
 
 
 class Match(db.Model):
