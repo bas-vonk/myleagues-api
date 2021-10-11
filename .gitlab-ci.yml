@@ -31,6 +31,7 @@ image: python:latest
 
 stages:
   - lint
+  - deploy
 
 black:
   stage: lint
@@ -67,3 +68,12 @@ mypy:
   script:
     - pip install mypy==0.910
     - mypy --install-types --non-interactive .
+
+deploy:
+  stage: deploy
+  image: google/cloud-sdk:latest
+  only:
+    - main
+  script:
+    - gcloud auth activate-service-account --key-file=$GCP_SERVICE_ACCOUNT
+    - gcloud --quiet --project myleagues app deploy
