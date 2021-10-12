@@ -17,13 +17,10 @@ def post():
 
     data = request.json
 
-    if g.user_id not in [data["home_player_id"], data["away_player_id"]]:
-        abort(403, "Only allowed to add own matches.")
-
     # Store a match
     match = Match.create(
         league_id=data["league_id"],
-        date=datetime.strptime(data["date"], "%d-%m-%Y"),
+        date=datetime.strptime(data["date"], "%Y-%m-%d"),
         home_player_id=data["home_player_id"],
         home_score=data["home_score"],
         away_player_id=data["away_player_id"],

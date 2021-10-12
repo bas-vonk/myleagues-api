@@ -56,7 +56,7 @@ def read(id):
                 **league.as_dict(),
                 "ranking": league.get_ranking(),
                 "players": league.get_players(),
-                "matches": league.get_matches(),
+                "matches": league.get_matches()[::-1],
             },
         }
     else:

@@ -109,7 +109,7 @@ def create_app(config_file, db) -> Flask:
 
         # Add before_request and errorhandler functions
         add_before_request(app)
-        # add_errorhandler(app)
+        add_errorhandler(app)
 
         # Register all the blueprints (views/endpoints)
         app.register_blueprint(blueprint_user)
