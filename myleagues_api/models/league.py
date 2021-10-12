@@ -55,7 +55,7 @@ class League(db.Model):
         """Create a league."""
 
         # Check if the ranking system exists
-        if ranking_system not in ranking_system_factory.ranking_systems:
+        if ranking_system not in ranking_system_factory._ranking_systems:
             abort(404, "Ranking system not found.")
 
         league = cls(
