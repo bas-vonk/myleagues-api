@@ -47,7 +47,10 @@ class League(db.Model):
         lazy=True,
     )
     matches = db.relationship(
-        "Match", order_by="asc(Match.date)", backref="league", lazy=True
+        "Match",
+        order_by="asc(Match.date), asc(Match.created_at)",
+        backref="league",
+        lazy=True,
     )
 
     @classmethod

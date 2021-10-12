@@ -1,6 +1,10 @@
 from numpy import absolute, argmax, linalg, sign, sqrt, zeros
+from pprint import pprint
 
 from myleagues_api.models.ranking_systems.ranking import BaseRankingSystem
+
+NOT_PLAYED_PLACEHOLDER = -1
+NOT_PLAYED_SCORE = 0
 
 
 class PerronFrobeniusRankingSystem(BaseRankingSystem):
@@ -62,7 +66,11 @@ class PerronFrobeniusRankingSystem(BaseRankingSystem):
             for opponent_id, points in opponents.items():
                 s_i_j = points
                 s_j_i = h2h_points[opponent_id][player_id]
-                h2h_scores[player_id][opponent_id] = cls.a_i_j(s_i_j, s_j_i)
+
+                if s_i_j == NOT_PLAYED_PLACEHOLDER:
+                    h2h_scores[player_id][opponent_id] = NOT_PLAYED_SCORE
+                else:
+                    h2h_scores[player_id][opponent_id] = cls.a_i_j(s_i_j, s_j_i)
 
         return h2h_scores
 
@@ -70,7 +78,7 @@ class PerronFrobeniusRankingSystem(BaseRankingSystem):
     def get_h2h_points(player_ids, matches):
         """Get head-to-head points from matches."""
 
-        player_dict = {player_id: 0 for player_id in player_ids}
+        player_dict = {player_id: NOT_PLAYED_PLACEHOLDER for player_id in player_ids}
 
         h2h_points = {player_id: player_dict.copy() for player_id in player_ids}
 
@@ -89,6 +97,8 @@ class PerronFrobeniusRankingSystem(BaseRankingSystem):
             for idx2, player_2_id in enumerate(player_ids):
                 a_i_j = h2h_scores[player_1_id][player_2_id]
                 matrix_a[idx1, idx2] = a_i_j
+
+        pprint(matrix_a)
 
         return matrix_a
 
