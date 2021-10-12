@@ -15,7 +15,11 @@ def create():
 
     data = request.json
 
-    league = League.create(name=data["name"], admin_user_id=g.user_id)
+    league = League.create(
+        name=data["name"],
+        ranking_system=data["ranking_system"],
+        admin_user_id=g.user_id,
+    )
 
     return (
         jsonify(
