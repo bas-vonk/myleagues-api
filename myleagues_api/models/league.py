@@ -9,10 +9,10 @@ from sqlalchemy.orm.exc import MultipleResultsFound, NoResultFound
 
 from myleagues_api.db import db
 from myleagues_api.models.ranking_systems.ranking import RankingSystemFactory
-from myleagues_api.models.ranking_systems.ranking_perron_frobenius import \
-    PerronFrobeniusRankingSystem
-from myleagues_api.models.ranking_systems.ranking_regular import \
-    RegularRankingSystem
+from myleagues_api.models.ranking_systems.ranking_perron_frobenius import (
+    PerronFrobeniusRankingSystem,
+)
+from myleagues_api.models.ranking_systems.ranking_regular import RegularRankingSystem
 from myleagues_api.tables.participations import participations
 
 # Register the ranking systems
