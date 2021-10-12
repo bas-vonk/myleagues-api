@@ -1,0 +1,10 @@
+runtime: python38
+service: api
+
+include:
+  - env_variables.yaml
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always

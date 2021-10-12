@@ -75,5 +75,6 @@ deploy:
   only:
     - main
   script:
+    - echo $GAE_ENV_VARIABLES > env_variables.yaml
     - gcloud auth activate-service-account --key-file=$GCP_SERVICE_ACCOUNT
     - gcloud --quiet --project myleagues app deploy
