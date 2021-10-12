@@ -1,5 +1,4 @@
 from numpy import absolute, argmax, linalg, sign, sqrt, zeros
-from pprint import pprint
 
 from myleagues_api.models.ranking_systems.ranking import BaseRankingSystem
 
@@ -97,8 +96,6 @@ class PerronFrobeniusRankingSystem(BaseRankingSystem):
             for idx2, player_2_id in enumerate(player_ids):
                 a_i_j = h2h_scores[player_1_id][player_2_id]
                 matrix_a[idx1, idx2] = a_i_j
-
-        pprint(matrix_a)
 
         return matrix_a
 
