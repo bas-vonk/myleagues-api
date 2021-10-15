@@ -5,7 +5,6 @@ from flask_cors import CORS
 from myleagues_api.models.league import League
 from myleagues_api.models.user import User
 
-
 blueprint_league = Blueprint("league", __name__)
 CORS(blueprint_league)
 
