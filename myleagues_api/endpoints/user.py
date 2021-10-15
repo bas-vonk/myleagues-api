@@ -12,7 +12,7 @@ blueprint_user = Blueprint("user", __name__)
 CORS(blueprint_user)
 
 
-@blueprint_user.route("/login", methods=["POST"])
+@blueprint_user.route("/user/login", methods=["POST"])
 def login():
     """Create endpoint for the 'login' action."""
 
@@ -33,7 +33,7 @@ def login():
     return jsonify({"access_token": AccessToken.generate_and_store(user)}), 200
 
 
-@blueprint_user.route("/register", methods=["POST"])
+@blueprint_user.route("/user/register", methods=["POST"])
 def register():
     """Create endpoint for the 'register' action."""
 

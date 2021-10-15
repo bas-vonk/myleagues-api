@@ -1,9 +1,10 @@
 """League endpoints."""
-
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
 
 from myleagues_api.models.league import League
+from myleagues_api.models.user import User
+
 
 blueprint_league = Blueprint("league", __name__)
 CORS(blueprint_league)
@@ -21,13 +22,20 @@ def create():
         admin_user_id=g.user_id,
     )
 
+    User().add_to_league(user_id=g.user_id, league_id=league.id)
+
     return (
         jsonify(
             {
                 "data": {
                     "type": "leagues",
                     "id": str(league.id),
-                    "attributes": league.as_dict(),
+                    "attributes": {
+                        **league.as_dict(),
+                        "ranking": league.get_ranking(),
+                        "players": league.get_players(),
+                        "matches": league.get_matches(),
+                    },
                 }
             }
         ),
@@ -38,7 +46,7 @@ def create():
 @blueprint_league.route("/league/", defaults={"id": None})
 @blueprint_league.route("/league/<id>", methods=["GET"])
 def read(id):
-    """Create endpoint for 'getleague' functionality."""
+    """Create endpoint for 'get league' functionality."""
 
     # Define the filters to find a league
     filter = {"id": id, "join_code": request.args.get("filter[join_code]")}
