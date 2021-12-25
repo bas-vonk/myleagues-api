@@ -14,9 +14,7 @@ class BaseRankingSystem(ABC):
     @abstractmethod
     def get_ranking(self):
         """Get ranking."""
-        raise NotImplementedError(
-            "Child class must contain 'get_current_ranking' method."
-        )
+        raise NotImplementedError("Child class must contain 'get_ranking' method.")
 
     def get_ranking_list_from_dict(self, ranking_dict):
         """Get ranking list from ranking dictionary."""
@@ -66,7 +64,9 @@ class BaseRankingSystem(ABC):
             for row in ranking:
                 player_id = row["player_id"]
                 datasets[player_id]["data"].append(row["pts_primary"])
-                datasets[player_id]["label"] = f"{row['position']}. {row['username']}"
+                datasets[player_id][
+                    "label"
+                ] = f"{row['position']}. {row['username']} ({row['pts_primary']})"
                 datasets[player_id]["position"] = row["position"]
 
         datasets = sorted(list(datasets.values()), key=lambda k: k["position"])
