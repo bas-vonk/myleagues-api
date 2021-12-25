@@ -5,15 +5,17 @@ from typing import Optional
 
 from flask import Flask, Response, abort, g, jsonify, request
 from flask_cors import CORS
+from oauthlib.oauth2 import WebApplicationClient
 from werkzeug.exceptions import HTTPException
 
+from myleagues_api.config import GOOGLE_CLIENT_ID
 from myleagues_api.db import init_db
 from myleagues_api.endpoints.league import blueprint_league
 from myleagues_api.endpoints.match import blueprint_match
 from myleagues_api.endpoints.user import blueprint_user
 from myleagues_api.models.access_token import AccessToken
 
-OPEN_ENDPOINTS = ["user.login", "user.register"]
+OPEN_ENDPOINTS = ["user.login", "user.register", "user.sso_login", "user.sso_callback"]
 OPEN_METHODS = ["OPTIONS"]
 
 
@@ -27,6 +29,9 @@ def add_before_request(app: Flask):
         Check whether the access token is in the cookie in a proper way.
         If it isn't, redirect to the Login page.
         """
+
+        # Add OAuth client
+        g.oauth_client = WebApplicationClient(GOOGLE_CLIENT_ID)
 
         # There's a couple of open endpoints for which the user doesn't need to be
         # authenticated
