@@ -2,6 +2,7 @@
 
 import json
 import requests
+import random
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
@@ -23,8 +24,8 @@ def get_google_provider_cfg():
     return requests.get(GOOGLE_DISCOVERY_URL).json()
 
 
-@blueprint_user.route("/sso_login", methods=["POST"])
-def sso_login():
+@blueprint_user.route("/user/login_google", methods=["GET"])
+def login_google():
 
     # Find out what URL to hit for Google login
     google_provider_cfg = get_google_provider_cfg()
@@ -34,14 +35,15 @@ def sso_login():
     # scopes that let you retrieve user's profile from Google
     request_uri = g.oauth_client.prepare_request_uri(
         authorization_endpoint,
-        redirect_uri=request.host_url + "sso_callback",
+        redirect_uri="https://localhost:80/callback",
         scope=["openid", "email", "profile"],
     )
-    return request_uri
+
+    return jsonify({"request_uri": request_uri})
 
 
-@blueprint_user.route("/sso_callback", methods=["GET"])
-def sso_callback():
+@blueprint_user.route("/user/callback", methods=["GET"])
+def callback():
 
     # Get authorization code Google sent back to you
     code = request.args.get("code")
@@ -55,7 +57,7 @@ def sso_callback():
     token_url, headers, body = g.oauth_client.prepare_token_request(
         token_endpoint,
         authorization_response=request.url,
-        redirect_url=request.base_url,
+        redirect_url="https://localhost:80/callback",
         code=code,
     )
 
@@ -71,14 +73,35 @@ def sso_callback():
 
     # Now that you have tokens (yay) let's find and hit the URL
     # from Google that gives you the user's profile information,
-    # including their Google profile image and email
+    # including their Google profile picture and email
     userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
     uri, headers, body = g.oauth_client.add_token(userinfo_endpoint)
     userinfo_response = requests.get(uri, headers=headers, data=body)
 
     user_data = userinfo_response.json()
 
-    return f"You are {user_data['name']}."
+    # Check if user exists with the given email address
+
+    try:
+        user = User().read({"google_sub": user_data["sub"]})
+
+        # Update picture and locale
+        user.picture = user_data["picture"]
+        user.locale = user_data["locale"]
+
+        user.save()
+
+    except HTTPException:
+
+        user = User.create(
+            username=user_data["email"].split("@")[0],
+            password=random.choice(["apple", "banana", "citrus"]),
+            picture=user_data["picture"],
+            locale=user_data["locale"],
+            google_sub=user_data["sub"],
+        )
+
+    return jsonify({"access_token": AccessToken.generate_and_store(user)}), 200
 
 
 @blueprint_user.route("/user/login", methods=["POST"])
@@ -89,8 +112,8 @@ def login():
 
     try:
 
-        user = User.get_by_email_and_password(
-            email=data["email"], password=data["password"]
+        user = User.get_by_username_and_password(
+            username=data["username"], password=data["password"]
         )
 
     except HTTPException as e:
@@ -110,7 +133,6 @@ def register():
 
     user = User.create(
         username=data["username"],
-        email=data["email"],
         password=data["password"],
     )
 

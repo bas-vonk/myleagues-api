@@ -15,8 +15,22 @@ from myleagues_api.endpoints.match import blueprint_match
 from myleagues_api.endpoints.user import blueprint_user
 from myleagues_api.models.access_token import AccessToken
 
-OPEN_ENDPOINTS = ["user.login", "user.register", "user.sso_login", "user.sso_callback"]
+OPEN_ENDPOINTS = [
+    "user.login",
+    "user.register",
+    "user.login_google",
+    "user.callback",
+    "healthcheck",
+]
 OPEN_METHODS = ["OPTIONS"]
+
+
+def add_healthcheck_endpoint(app: Flask):
+    """Add healthcheck endpoint to app."""
+
+    @app.route("/healthcheck")
+    def healthcheck():
+        return jsonify({"message": "I'm healthy!"})
 
 
 def add_before_request(app: Flask):
@@ -114,7 +128,11 @@ def create_app(config_file, db) -> Flask:
 
         # Add before_request and errorhandler functions
         add_before_request(app)
-        add_errorhandler(app)
+        # add_errorhandler(app)
+        print("doei")
+
+        # Register healthcheck endpoint
+        add_healthcheck_endpoint(app)
 
         # Register all the blueprints (views/endpoints)
         app.register_blueprint(blueprint_user)
