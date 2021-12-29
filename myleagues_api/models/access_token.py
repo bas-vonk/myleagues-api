@@ -39,8 +39,10 @@ class AccessToken(db.Model):
             "exp": time() + LIFE_SPAN,
             "user_id": str(user.id),
             "username": user.username,
-            "email": user.email,
+            "picture": user.picture,
+            "locale": user.locale,
         }
+
         access_token_string = jwt.encode(payload, PRIVATE_KEY, algorithm=ALGORITHM)
         access_token_object = cls(
             user_id=user.id, access_token=access_token_string, created_at=time()

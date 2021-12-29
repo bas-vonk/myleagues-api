@@ -20,8 +20,8 @@ def login():
 
     try:
 
-        user = User.get_by_email_and_password(
-            email=data["email"], password=data["password"]
+        user = User.get_by_username_and_password(
+            username=data["username"], password=data["password"]
         )
 
     except HTTPException as e:
@@ -41,7 +41,6 @@ def register():
 
     user = User.create(
         username=data["username"],
-        email=data["email"],
         password=data["password"],
     )
 
