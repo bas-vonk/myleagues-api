@@ -1,6 +1,6 @@
 import json
 import os
-import random
+import uuid
 
 import requests
 from werkzeug.exceptions import HTTPException
@@ -78,8 +78,6 @@ class SamlProviderGoogle(BaseSamlProvider):
 
         user_data = userinfo_response.json()
 
-        # Check if user exists with the given email address
-
         try:
             user = User().read({"google_sub": user_data["sub"]})
 
@@ -96,17 +94,14 @@ class SamlProviderGoogle(BaseSamlProvider):
             username_candidate = username_base
             suffix = 1
 
-            print(username_candidate)
-            print(User().username_exists(username_candidate))
-            # print("doei")
-
             while User().username_exists(username_candidate):
                 username_candidate = username_base + str(suffix)
                 suffix = suffix + 1
 
+            # Create the user
             user = User.create(
                 username=username_candidate,
-                password=random.choice(["apple", "banana", "citrus"]),
+                password=uuid.uuid4().hex,
                 picture=user_data["picture"],
                 locale=user_data["locale"],
                 google_sub=user_data["sub"],
