@@ -64,7 +64,7 @@ class User(db.Model):
         except exc.IntegrityError:
 
             db.session.rollback()
-            abort(409, f"Username already taken.")
+            abort(409, "Username already taken.")
 
     @classmethod
     def username_exists(cls, username: str):

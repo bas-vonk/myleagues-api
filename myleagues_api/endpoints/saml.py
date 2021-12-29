@@ -21,6 +21,7 @@ CORS(blueprint_saml)
 
 @blueprint_saml.route("/saml/get_request_uri/<provider_name>", methods=["GET"])
 def get_request_uri(provider_name):
+    """Expose 'Get request URI' endpoint."""
 
     # Get the provider
     saml_provider = saml_provider_factory.get_saml_provider(provider_name)
@@ -32,6 +33,7 @@ def get_request_uri(provider_name):
 
 @blueprint_saml.route("/saml/callback", methods=["GET"])
 def callback():
+    """Expose 'Callback' endpoint."""
 
     # Get authorization code Google sent back to you
     code = request.args.get("code")

@@ -24,18 +24,19 @@ class BaseSamlProvider(ABC):
 
     @staticmethod
     def get_redirect_uri():
+        """Return the redirect URI for this app."""
         return os.environ["SAML_REDIRECT_URI"]
 
     @abstractmethod
     def get_request_uri(self):
-        """Get request uri."""
+        """Expose 'Get request uri' endpoint."""
         raise NotImplementedError(
             "Child class must implement 'get_request_uri' method."
         )
 
     @abstractmethod
     def callback(self):
-        """The callback endpoint."""
+        """Expose the 'callback' endpoint."""
         raise NotImplementedError("Child class must implement 'callback' method.")
 
     @staticmethod
