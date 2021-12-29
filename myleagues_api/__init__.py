@@ -128,8 +128,7 @@ def create_app(config_file, db) -> Flask:
 
         # Add before_request and errorhandler functions
         add_before_request(app)
-        # add_errorhandler(app)
-        print("doei")
+        add_errorhandler(app)
 
         # Register healthcheck endpoint
         add_healthcheck_endpoint(app)
