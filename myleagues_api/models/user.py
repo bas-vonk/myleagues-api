@@ -4,6 +4,7 @@ from flask import abort
 from sqlalchemy import exc
 from sqlalchemy.dialects.postgresql import UUID
 from sqlalchemy.orm.exc import NoResultFound
+from werkzeug.exceptions import HTTPException
 from werkzeug.security import check_password_hash, generate_password_hash
 
 from myleagues_api.db import db
@@ -66,6 +67,19 @@ class User(db.Model):
             abort(409, f"Username already taken.")
 
     @classmethod
+    def username_exists(cls, username: str):
+        """Check whether a username exists."""
+
+        # Catch the HTTP Exception thrown by Flask abort and return whether
+        # a user exists or not
+        try:
+            cls.read({"username": username})
+        except HTTPException:
+            return False
+
+        return True
+
+    @classmethod
     def read(cls, filter):
         """Read a user."""
 
@@ -79,7 +93,7 @@ class User(db.Model):
     def get_by_username_and_password(cls, username: str, password: str):
         """Get a user by username and password."""
 
-        # Hash the email to use that in the lookup
+        # Get the user
         user = cls.read({"username": username})
 
         if not user.password_is_correct(password):

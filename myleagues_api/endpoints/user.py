@@ -1,132 +1,15 @@
 """User endpoints."""
 
-import os
-import json
-import requests
-import random
-import time
-from cryptography.fernet import Fernet
 from flask import Blueprint, abort, g, jsonify, request
 from flask_cors import CORS
 from werkzeug.exceptions import HTTPException
 
-from myleagues_api.config import (
-    GOOGLE_CLIENT_ID,
-    GOOGLE_CLIENT_SECRET,
-    GOOGLE_DISCOVERY_URL,
-)
 from myleagues_api.models.access_token import AccessToken
 from myleagues_api.models.league import League
 from myleagues_api.models.user import User
 
 blueprint_user = Blueprint("user", __name__)
 CORS(blueprint_user)
-
-state_validity_seconds = 300
-
-# TODO: Replace with environment
-ENCODING = "utf-8"
-
-db_salt = os.environ["SECRET_KEY"]
-f = Fernet(os.environ["FERNET_KEY"].encode(ENCODING))
-
-
-def get_google_provider_cfg():
-    return requests.get(GOOGLE_DISCOVERY_URL).json()
-
-
-@blueprint_user.route("/user/login_google", methods=["GET"])
-def login_google():
-
-    # Find out what URL to hit for Google login
-    google_provider_cfg = get_google_provider_cfg()
-    authorization_endpoint = google_provider_cfg["authorization_endpoint"]
-
-    # Create the state dict
-    state_str = json.dumps({"provider": "google", "time": int(time.time())})
-    state = f.encrypt(state_str.encode(ENCODING)).decode(ENCODING)
-
-    # Use library to construct the request for Google login and provide
-    # scopes that let you retrieve user's profile from Google
-    request_uri = g.oauth_client.prepare_request_uri(
-        authorization_endpoint,
-        redirect_uri="https://localhost:80/callback",
-        scope=["openid", "email", "profile"],
-        state=state,
-    )
-
-    return jsonify({"request_uri": request_uri})
-
-
-@blueprint_user.route("/user/callback", methods=["GET"])
-def callback():
-
-    # Get authorization code Google sent back to you
-    code = request.args.get("code")
-
-    state = request.args.get("state")
-    state_str = f.decrypt(state.encode(ENCODING)).decode(ENCODING)
-    state_dict = json.loads(state_str)
-
-    # Check validity of state
-    print(time.time() - state_dict["time"])
-    if time.time() - state_dict["time"] > state_validity_seconds:
-        abort(401, "State expired.")
-
-    # Find out what URL to hit to get tokens that allow you to ask for
-    # things on behalf of a user
-    google_provider_cfg = get_google_provider_cfg()
-    token_endpoint = google_provider_cfg["token_endpoint"]
-
-    # Prepare and send a request to get tokens! Yay tokens!
-    token_url, headers, body = g.oauth_client.prepare_token_request(
-        token_endpoint,
-        authorization_response=request.url,
-        redirect_url="https://localhost:80/callback",
-        code=code,
-    )
-
-    token_response = requests.post(
-        token_url,
-        headers=headers,
-        data=body,
-        auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
-    )
-
-    # Parse the tokens!
-    g.oauth_client.parse_request_body_response(json.dumps(token_response.json()))
-
-    # Now that you have tokens (yay) let's find and hit the URL
-    # from Google that gives you the user's profile information,
-    # including their Google profile picture and email
-    userinfo_endpoint = google_provider_cfg["userinfo_endpoint"]
-    uri, headers, body = g.oauth_client.add_token(userinfo_endpoint)
-    userinfo_response = requests.get(uri, headers=headers, data=body)
-
-    user_data = userinfo_response.json()
-
-    # Check if user exists with the given email address
-
-    try:
-        user = User().read({"google_sub": user_data["sub"]})
-
-        # Update picture and locale
-        user.picture = user_data["picture"]
-        user.locale = user_data["locale"]
-
-        user.save()
-
-    except HTTPException:
-
-        user = User.create(
-            username=user_data["email"].split("@")[0],
-            password=random.choice(["apple", "banana", "citrus"]),
-            picture=user_data["picture"],
-            locale=user_data["locale"],
-            google_sub=user_data["sub"],
-        )
-
-    return jsonify({"access_token": AccessToken.generate_and_store(user)}), 200
 
 
 @blueprint_user.route("/user/login", methods=["POST"])
