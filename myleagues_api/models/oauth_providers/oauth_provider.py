@@ -14,8 +14,8 @@ state_validity_seconds = 300
 f = Fernet(os.environ["FERNET_KEY"].encode(ENCODING))
 
 
-class BaseSamlProvider(ABC):
-    """Base class for the saml providers."""
+class BaseOAuthProvider(ABC):
+    """Base class for the OAuth providers."""
 
     def __init__(self, provider_name, client_id):
 
@@ -25,7 +25,7 @@ class BaseSamlProvider(ABC):
     @staticmethod
     def get_redirect_uri():
         """Return the redirect URI for this app."""
-        return os.environ["SAML_REDIRECT_URI"]
+        return os.environ["OAUTH_REDIRECT_URI"]
 
     @abstractmethod
     def get_request_uri(self):
@@ -60,22 +60,22 @@ class BaseSamlProvider(ABC):
         return state_dict
 
 
-class SamlProviderFactory:
+class OAuthProviderFactory:
     """Ranking system factory."""
 
     def __init__(self):
-        self._saml_providers = {}
+        self._oauth_providers = {}
 
-    def register_saml_provider(self, saml_provider_name, saml_provider_obj):
-        """Register a saml provider."""
+    def register_oauth_provider(self, oauth_provider_name, oauth_provider_obj):
+        """Register a OAuth provider."""
 
-        self._saml_providers[saml_provider_name] = saml_provider_obj
+        self._oauth_providers[oauth_provider_name] = oauth_provider_obj
 
-    def get_saml_provider(self, saml_provider_name, **kwargs):
+    def get_oauth_provider(self, oauth_provider_name, **kwargs):
         """Get a ranking system."""
 
-        saml_provider_obj = self._saml_providers.get(saml_provider_name)
-        if not saml_provider_obj:
-            raise ValueError(saml_provider_name)
+        oauth_provider_obj = self._oauth_providers.get(oauth_provider_name)
+        if not oauth_provider_obj:
+            raise ValueError(oauth_provider_name)
 
-        return saml_provider_obj(**kwargs)
+        return oauth_provider_obj(**kwargs)

@@ -10,15 +10,15 @@ from werkzeug.exceptions import HTTPException
 from myleagues_api.db import init_db
 from myleagues_api.endpoints.league import blueprint_league
 from myleagues_api.endpoints.match import blueprint_match
-from myleagues_api.endpoints.saml import blueprint_saml
+from myleagues_api.endpoints.oauth import blueprint_oauth
 from myleagues_api.endpoints.user import blueprint_user
 from myleagues_api.models.access_token import AccessToken
 
 OPEN_ENDPOINTS = [
     "user.login",
     "user.register",
-    "saml.get_request_uri",
-    "saml.callback",
+    "oauth.get_request_uri",
+    "oauth.callback",
     "healthcheck",
 ]
 OPEN_METHODS = ["OPTIONS"]
@@ -133,7 +133,7 @@ def create_app(config_file, db) -> Flask:
         app.register_blueprint(blueprint_user)
         app.register_blueprint(blueprint_league)
         app.register_blueprint(blueprint_match)
-        app.register_blueprint(blueprint_saml)
+        app.register_blueprint(blueprint_oauth)
 
         # Return the app
         return app

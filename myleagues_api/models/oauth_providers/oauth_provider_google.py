@@ -6,7 +6,7 @@ import requests
 from werkzeug.exceptions import HTTPException
 
 from myleagues_api.models.access_token import AccessToken
-from myleagues_api.models.saml_providers.saml_provider import BaseSamlProvider
+from myleagues_api.models.oauth_providers.oauth_provider import BaseOAuthProvider
 from myleagues_api.models.user import User
 
 GOOGLE_PROVIDER_NAME = "google"
@@ -15,8 +15,8 @@ GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", None)
 GOOGLE_DISCOVERY_URL = "https://accounts.google.com/.well-known/openid-configuration"
 
 
-class SamlProviderGoogle(BaseSamlProvider):
-    """Class for the Google SAML provider."""
+class OAuthProviderGoogle(BaseOAuthProvider):
+    """Class for the Google OAuth provider."""
 
     def __init__(self):
         super().__init__(GOOGLE_PROVIDER_NAME, GOOGLE_CLIENT_ID)

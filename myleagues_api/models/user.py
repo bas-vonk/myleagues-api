@@ -25,6 +25,7 @@ class User(db.Model):
     picture = db.Column(db.String(256))
     locale = db.Column(db.String(2))
     google_sub = db.Column(db.String(128))
+    microsoft_sub = db.Column(db.String(128))
     deleted_at = db.Column(db.BigInteger, index=False)
 
     leagues = db.relationship(
@@ -40,7 +41,15 @@ class User(db.Model):
         return cls
 
     @classmethod
-    def create(cls, username, password, picture=None, locale=None, google_sub=None):
+    def create(
+        cls,
+        username,
+        password,
+        picture=None,
+        locale=None,
+        google_sub=None,
+        microsoft_sub=None,
+    ):
         """Create a user."""
 
         user_dict = {
@@ -49,6 +58,7 @@ class User(db.Model):
             "picture": picture,
             "locale": locale,
             "google_sub": google_sub,
+            "microsoft_sub": microsoft_sub,
         }
 
         user = cls(**user_dict)
