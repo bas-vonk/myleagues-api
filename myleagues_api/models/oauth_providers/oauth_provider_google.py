@@ -1,11 +1,10 @@
-import json
 import os
 import uuid
+import base64
 
 import requests
 from werkzeug.exceptions import HTTPException
 
-from myleagues_api.models.access_token import AccessToken
 from myleagues_api.models.oauth_providers.oauth_provider import BaseOAuthProvider
 from myleagues_api.models.user import User
 
@@ -19,93 +18,67 @@ class OAuthProviderGoogle(BaseOAuthProvider):
     """Class for the Google OAuth provider."""
 
     def __init__(self):
-        super().__init__(GOOGLE_PROVIDER_NAME, GOOGLE_CLIENT_ID)
+        super().__init__(
+            GOOGLE_PROVIDER_NAME,
+            GOOGLE_CLIENT_ID,
+            GOOGLE_CLIENT_SECRET,
+            GOOGLE_DISCOVERY_URL,
+        )
+
+    def _get_picture_uri(self, user_data):
+
+        # Prepare the call to obtain the image by adding the access_token
+        uri, headers, body = self.oauth_client.add_token(user_data["picture"])
+
+        # Obtain the image
+        response = requests.get(uri, headers=headers, data=body)
+
+        return (
+            f"data:{response.headers['Content-Type']};"
+            f"base64,{base64.b64encode(response.content).decode('utf-8')}"
+        )
 
     @staticmethod
-    def get_provider_cfg():
-        """Get the provider config."""
-        return requests.get(GOOGLE_DISCOVERY_URL).json()
+    def _get_username_from_email_address(email_address):
 
-    def get_request_uri(self):
-        """Get the request URI."""
+        # Generate unique username
+        username_base = email_address.split("@")[0]
+        username = username_base
+        suffix = 1
 
-        # Find out what Authorization endpoint to hit for Google SSO
-        provider_cfg = self.get_provider_cfg()
-        authorization_endpoint = provider_cfg["authorization_endpoint"]
+        while User().username_exists(username):
+            username = username_base + str(suffix)
+            suffix = suffix + 1
 
-        # Create the state parameter
-        state = self.create_state_parameter(self.provider_name)
+        return username
 
-        # Prepare and return the request uri
-        return self.oauth_client.prepare_request_uri(
-            authorization_endpoint,
-            redirect_uri=self.get_redirect_uri(),
-            scope=["openid", "email", "profile"],
-            state=state,
-        )
+    def process_user_data(self, user_data):
 
-    def callback(self, code, request_url):
-        """Process the callback."""
-
-        # Find out what token endpoint to hit for Google SSO
-        provider_cfg = self.get_provider_cfg()
-        token_endpoint = provider_cfg["token_endpoint"]
-
-        # Prepare and send a request to get tokens! Yay tokens!
-        token_url, headers, body = self.oauth_client.prepare_token_request(
-            token_endpoint,
-            authorization_response=request_url,
-            redirect_url=self.get_redirect_uri(),
-            code=code,
-        )
-
-        token_response = requests.post(
-            token_url,
-            headers=headers,
-            data=body,
-            auth=(GOOGLE_CLIENT_ID, GOOGLE_CLIENT_SECRET),
-        )
-
-        # Parse the tokens!
-        self.oauth_client.parse_request_body_response(json.dumps(token_response.json()))
-
-        # Now that you have tokens (yay) let's find and hit the URL
-        # from Google that gives you the user's profile information,
-        # including their Google profile picture and email
-        userinfo_endpoint = provider_cfg["userinfo_endpoint"]
-        uri, headers, body = self.oauth_client.add_token(userinfo_endpoint)
-        userinfo_response = requests.get(uri, headers=headers, data=body)
-
-        user_data = userinfo_response.json()
-
+        # First check if a user already exists for this Google identity
+        # If it exists, update the 'locale' and 'picture' and return the user
         try:
+
+            # Scenario A: User already exists
+
             user = User().read({"google_sub": user_data["sub"]})
 
-            # Update picture and locale
-            user.picture = user_data["picture"]
             user.locale = user_data["locale"]
-
+            user.picture = self._get_picture_uri(user_data)
             user.save()
+
+            return user
 
         except HTTPException:
 
-            # Generate unique username
-            username_base = user_data["email"].split("@")[0]
-            username_candidate = username_base
-            suffix = 1
+            # Scenario B: User not found --> Create new user
 
-            while User().username_exists(username_candidate):
-                username_candidate = username_base + str(suffix)
-                suffix = suffix + 1
+            # Obtain a unique username
+            username = self._get_username_from_email_address(user_data["email_address"])
 
             # Create the user
-            user = User.create(
-                username=username_candidate,
+            return User.create(
+                username=username,
                 password=uuid.uuid4().hex,
-                picture=user_data["picture"],
-                locale=user_data["locale"],
+                picture=self._get_picture_uri(),
                 google_sub=user_data["sub"],
             )
-
-        # Generate an access token and return it
-        return AccessToken.generate_and_store(user)

@@ -22,7 +22,7 @@ class User(db.Model):
     id = db.Column(UUID(as_uuid=True), primary_key=True, default=uuid.uuid4)
     username = db.Column(db.String(256), unique=True)
     password_hashed = db.Column(db.String(128))
-    picture = db.Column(db.String(256))
+    picture = db.Column(db.Text)
     locale = db.Column(db.String(2))
     google_sub = db.Column(db.String(128))
     microsoft_sub = db.Column(db.String(128))

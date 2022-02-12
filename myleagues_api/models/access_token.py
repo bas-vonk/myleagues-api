@@ -39,7 +39,6 @@ class AccessToken(db.Model):
             "exp": time() + LIFE_SPAN,
             "user_id": str(user.id),
             "username": user.username,
-            "picture": user.picture,
             "locale": user.locale,
         }
 

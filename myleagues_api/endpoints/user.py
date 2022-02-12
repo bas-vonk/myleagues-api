@@ -98,3 +98,10 @@ def user_leagues():
         )
 
     return jsonify({"data": data}), 200
+
+
+@blueprint_user.route("/user/picture", methods=["GET"])
+def picture():
+
+    user = User.read({"id": g.user_id})
+    return user.picture

@@ -1,12 +1,12 @@
-import json
 import os
 import uuid
+import base64
 
 import requests
 from werkzeug.exceptions import HTTPException
 
-from myleagues_api.models.access_token import AccessToken
 from myleagues_api.models.oauth_providers.oauth_provider import BaseOAuthProvider
+from myleagues_api.models.oauth_providers.default_avatar import DEFAULT_AVATAR
 from myleagues_api.models.user import User
 
 MICROSOFT_PROVIDER_NAME = "microsoft"
@@ -16,103 +16,78 @@ MICROSOFT_DISCOVERY_URL = (
     "https://login.microsoftonline.com/common/v2.0/.well-known/openid-configuration"
 )
 
+DEFAULT_LOCALE = "en"
+
 
 class OAuthProviderMicrosoft(BaseOAuthProvider):
     """Class for the Microsoft OAuth provider."""
 
     def __init__(self):
-        super().__init__(MICROSOFT_PROVIDER_NAME, MICROSOFT_CLIENT_ID)
+        super().__init__(
+            MICROSOFT_PROVIDER_NAME,
+            MICROSOFT_CLIENT_ID,
+            MICROSOFT_CLIENT_SECRET,
+            MICROSOFT_DISCOVERY_URL,
+        )
+
+    def _get_picture_uri(self, user_data):
+
+        # Prepare the call to obtain the image by adding the access_token
+        uri, headers, body = self.oauth_client.add_token(user_data["picture"])
+
+        # Obtain the image
+        response = requests.get(uri, headers=headers, data=body)
+
+        # Fallback for if the response is not an image
+        if response.headers["Content-Type"] == "application/json":
+            return DEFAULT_AVATAR
+
+        return (
+            f"data:{response.headers['Content-Type']};"
+            f"base64,{base64.b64encode(response.content).decode('utf-8')}"
+        )
 
     @staticmethod
-    def get_provider_cfg():
-        """Get the provider config."""
-        return requests.get(MICROSOFT_DISCOVERY_URL).json()
+    def _get_username_from_email_address(email_address):
 
-    def get_request_uri(self):
-        """Get the request URI."""
+        # Generate unique username
+        username_base = email_address.split("@")[0]
+        username = username_base
+        suffix = 1
 
-        # Find out what Authorization endpoint to hit for Microsoft SSO
-        provider_cfg = self.get_provider_cfg()
-        authorization_endpoint = provider_cfg["authorization_endpoint"]
+        while User().username_exists(username):
+            username = username_base + str(suffix)
+            suffix = suffix + 1
 
-        # Create the state parameter
-        state = self.create_state_parameter(self.provider_name)
+        return username
 
-        # Prepare and return the request uri
-        return self.oauth_client.prepare_request_uri(
-            authorization_endpoint,
-            redirect_uri=self.get_redirect_uri(),
-            scope=["openid", "email", "profile"],
-            state=state,
-        )
+    def process_user_data(self, user_data):
 
-    def callback(self, code, request_url):
-        """Process the callback."""
-
-        # Find out what token endpoint to hit for Google SSO
-        provider_cfg = self.get_provider_cfg()
-        token_endpoint = provider_cfg["token_endpoint"]
-
-        # Prepare and send a request to get tokens! Yay tokens!
-        token_url, headers, body = self.oauth_client.prepare_token_request(
-            token_endpoint,
-            authorization_response=request_url,
-            redirect_url=self.get_redirect_uri(),
-            code=code,
-        )
-
-        token_response = requests.post(
-            token_url,
-            headers=headers,
-            data=body,
-            auth=(MICROSOFT_CLIENT_ID, MICROSOFT_CLIENT_SECRET),
-        )
-
-        # Parse the tokens!
-        self.oauth_client.parse_request_body_response(json.dumps(token_response.json()))
-
-        # Now that you have tokens (yay) let's find and hit the URL
-        # from Google that gives you the user's profile information,
-        # including their Google profile picture and email
-        userinfo_endpoint = provider_cfg["userinfo_endpoint"]
-        uri, headers, body = self.oauth_client.add_token(userinfo_endpoint)
-        userinfo_response = requests.get(uri, headers=headers, data=body)
-
-        user_data = userinfo_response.json()
-
+        # First check if a user already exists for this Google identity
+        # If it exists, update the 'locale' and 'picture' and return the user
         try:
+
+            # Scenario A: User already exists
+
             user = User().read({"microsoft_sub": user_data["sub"]})
 
-            # Update picture and locale
-            user.picture = user_data["picture"]
-
-            if "locale" in user_data:
-                user.locale = user_data["locale"]
-
+            user.locale = DEFAULT_LOCALE
+            user.picture = self._get_picture_uri(user_data)
             user.save()
+
+            return user
 
         except HTTPException:
 
-            # Generate unique username
-            username_base = user_data["email"].split("@")[0]
-            username_candidate = username_base
-            suffix = 1
+            # Scenario B: User not found --> Create new user
 
-            while User().username_exists(username_candidate):
-                username_candidate = username_base + str(suffix)
-                suffix = suffix + 1
+            # Obtain a unique username
+            username = self._get_username_from_email_address(user_data["email_address"])
 
             # Create the user
-            user = User.create(
-                username=username_candidate,
+            return User.create(
+                username=username,
                 password=uuid.uuid4().hex,
-                picture=user_data["picture"],
+                picture=self._get_picture_uri(),
                 microsoft_sub=user_data["sub"],
             )
-
-            if "locale" in user_data:
-                user.locale = user_data["locale"]
-                user.save()
-
-        # Generate an access token and return it
-        return AccessToken.generate_and_store(user)
